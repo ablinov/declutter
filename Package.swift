@@ -10,15 +10,16 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/JohnSundell/Files.git", from: "3.0.0"),
-//        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.5"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "Declutter",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                "Files"
+                .product(name: "Logging", package: "swift-log"),
+                "Files",                
             ]),
         .testTarget(
             name: "DeclutterTests",

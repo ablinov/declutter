@@ -1,7 +1,13 @@
 import XCTest
+//@testable import Declutter
 import class Foundation.Bundle
 
 final class DeclutterTests: XCTestCase {
+//    func testArrayExtenstions() throws {
+//        let array = [1,2,3,4,5]
+//
+//        XCTAssertEqual(array.divided(into: 2).count, 2)
+//    }
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
