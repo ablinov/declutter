@@ -8,72 +8,25 @@ let logger = Logger(label: "main")
 
 struct Declutter: ParsableCommand {
     
-    @Argument(help: "Specify directory to declutter")
+    @Argument(help: "Specify folder to declutter")
     var path: String
     
     @Argument(default: "results.json", help: "Specify output file")
-    var outputFile: String
+    var outputFileName: String
+    
+    @Option(help: "Folders to ignore")
+    var ignore: [String]
     
     @Flag(name: .shortAndLong, default: false, inversion: .prefixedNo)
     var dryRun: Bool
     
     func run() throws {
-        logger.info("Gathering files")
-        
         let sourceFolder = try Folder(path: path)
-        let output = try Folder.current.createFileIfNeeded(withName: outputFile)
+        let outputFile = try Folder.current.createFileIfNeeded(withName: outputFileName)
+        let foldersToIgnore = try ignore.map { try Folder(path: $0) }
         
-        var allFiles = Array(sourceFolder.files)
+        let duplicates = try findDuplicateFiles(in: sourceFolder, ignoring: foldersToIgnore)
         
-        sourceFolder.makeSubfolderSequence(recursive: true, includeHidden: false).forEach { subfolder in
-            allFiles.append(contentsOf: subfolder.files)
-        }
-        
-        logger.info("Gathered \(allFiles.count) files")
-        
-        logger.info("Calculating hashes")
-        
-        var allFilesByHash: [String: [File]] = [:]
-        var anyError: Error? = nil
-
-        let numberOfSlices = allFiles.count.clamped(to: 1...32)
-        let fileSlices = allFiles.divided(into: numberOfSlices)
-                
-        let resultCollationQueue = DispatchQueue(label: "HashCalculation.ResultCollation")
-        
-        logger.info("Split files into \(fileSlices.count) slices")
-        DispatchQueue.concurrentPerform(iterations: fileSlices.count) { i in
-            let slice = fileSlices[i]
-            var sliceHashes: [String: [File]] = [:]
-            var sliceError: Error? = nil
-            
-            for file in slice {
-                let hashCalculation = Result { try file.calculateMD5Hash() }
-                
-                switch hashCalculation {
-                case .success(let hash):
-                    sliceHashes[hash, default: []].append(file)
-                case .failure(let error):
-                    sliceError = error
-                    break
-                }
-            }
-            
-            resultCollationQueue.sync {
-                if let sliceError = sliceError {
-                    anyError = sliceError
-                } else {
-                    allFilesByHash.merge(sliceHashes) { $0 + $1 }
-                }
-            }
-        }
-        
-        guard anyError == nil else { throw anyError! }
-
-        logger.info("Finished calculting hashes. Found \(allFilesByHash.count) unique files")
-        
-        let duplicates = allFilesByHash.values.filter { $0.count > 1 }.map { $0.map(\.path) }
-
         if duplicates.count > 0 {
             let totalDuplicateFiles = duplicates.reduce(0) { $0 + ($1.count - 1) }
             
@@ -81,9 +34,10 @@ struct Declutter: ParsableCommand {
         } else {
             logger.info("Did not find any duplicates in \(path)")
         }
-        
-        let json = try JSONEncoder().encode(["duplicates": duplicates])
-        try output.write(data: json)
+
+        let duplicatePaths = duplicates.map { $0.map(\.path) }
+
+        try write(duplicateResults: duplicatePaths, to: outputFile)
     }
 }
 

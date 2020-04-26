@@ -34,3 +34,19 @@ extension File {
         return hashString
     }
 }
+
+extension Folder {
+    public func isWithin(_ anotherFolder: Folder) -> Bool {
+        var currentParent = parent
+        
+        while currentParent != nil {
+            if currentParent == anotherFolder {
+                return true
+            }
+            
+            currentParent = currentParent?.parent
+        }
+        
+        return false
+    }
+}
