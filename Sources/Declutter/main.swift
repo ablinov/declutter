@@ -11,6 +11,9 @@ struct Declutter: ParsableCommand {
     @Argument(help: "Specify directory to declutter")
     var path: String
     
+    @Argument(default: "results.json", help: "Specify output file")
+    var outputFile: String
+    
     @Flag(name: .shortAndLong, default: false, inversion: .prefixedNo)
     var dryRun: Bool
     
@@ -18,6 +21,8 @@ struct Declutter: ParsableCommand {
         logger.info("Gathering files")
         
         let sourceFolder = try Folder(path: path)
+        let output = try Folder.current.createFileIfNeeded(withName: outputFile)
+        
         var allFiles = Array(sourceFolder.files)
         
         sourceFolder.makeSubfolderSequence(recursive: true, includeHidden: false).forEach { subfolder in
@@ -67,18 +72,18 @@ struct Declutter: ParsableCommand {
 
         logger.info("Finished calculting hashes. Found \(allFilesByHash.count) unique files")
         
-        let duplicates = allFilesByHash.values.filter { $0.count > 1 }
+        let duplicates = allFilesByHash.values.filter { $0.count > 1 }.map { $0.map(\.path) }
 
         if duplicates.count > 0 {
             let totalDuplicateFiles = duplicates.reduce(0) { $0 + ($1.count - 1) }
+            
             logger.info("Found \(totalDuplicateFiles) that are duplicates and can be deleted")
-
-//            duplicates.forEach { duplicateFiles in
-//                duplicateFiles.forEach { print($0.path) }
-//            }
         } else {
             logger.info("Did not find any duplicates in \(path)")
         }
+        
+        let json = try JSONEncoder().encode(["duplicates": duplicates])
+        try output.write(data: json)
     }
 }
 
