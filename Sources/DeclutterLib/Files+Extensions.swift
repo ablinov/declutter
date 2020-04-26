@@ -35,6 +35,12 @@ extension File {
     }
 }
 
+func recursivelyCollectFiles(in folder: Folder, ignoring foldersToIgnore: [Folder] = []) -> [File] {
+    guard !foldersToIgnore.contains(folder) else { return [] }
+    
+    return Array(folder.files) + folder.subfolders.flatMap { recursivelyCollectFiles(in: $0, ignoring: foldersToIgnore) }
+}
+
 extension Folder {
     public func isWithin(_ anotherFolder: Folder) -> Bool {
         var currentParent = parent

@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexey Blinov on 26/04/2020.
-//
-
 import Foundation
 import Files
 import Logging
@@ -62,10 +55,4 @@ public func findDuplicateFiles(in folder: Folder,
     let duplicates = allFilesByHash.values.filter { $0.count > 1 }
     
     return duplicates
-}
-
-func recursivelyCollectFiles(in folder: Folder, ignoring foldersToIgnore: [Folder] = []) -> [File] {
-    guard !foldersToIgnore.contains(folder) else { return [] }
-    
-    return Array(folder.files) + folder.subfolders.flatMap { recursivelyCollectFiles(in: $0, ignoring: foldersToIgnore) }
 }
