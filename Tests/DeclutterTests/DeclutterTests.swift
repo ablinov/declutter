@@ -3,12 +3,7 @@ import XCTest
 import class Foundation.Bundle
 
 final class DeclutterTests: XCTestCase {
-//    func testArrayExtenstions() throws {
-//        let array = [1,2,3,4,5]
-//
-//        XCTAssertEqual(array.divided(into: 2).count, 2)
-//    }
-    func testExample() throws {
+    func testNotProvidingInputFilePrintsError() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
@@ -23,16 +18,19 @@ final class DeclutterTests: XCTestCase {
         let process = Process()
         process.executableURL = fooBinary
 
-        let pipe = Pipe()
-        process.standardOutput = pipe
+        let stdOut = Pipe()
+        let stdErr = Pipe()
+        process.standardOutput = stdOut
+        process.standardError = stdErr
 
         try process.run()
         process.waitUntilExit()
 
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+        let output = String(data: stdOut.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)
+        let errorOutput = String(data: stdErr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)
 
-        XCTAssertEqual(output, "Hello, world!\n")
+        XCTAssertEqual(output, "")
+        XCTAssertTrue(errorOutput!.contains("Error: Missing expected argument '<path>'"), "Error output did not contain required text")
     }
 
     /// Returns path to the built products directory.
@@ -48,6 +46,6 @@ final class DeclutterTests: XCTestCase {
     }
 
     static var allTests = [
-        ("testExample", testExample),
+        ("testExample", testNotProvidingInputFilePrintsError),
     ]
 }

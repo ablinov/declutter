@@ -15,14 +15,24 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "DeclutterLib",
+            dependencies: [
+                .product(name: "Logging", package: "swift-log"),
+                "Files",
+            ]),
+        .target(
             name: "Declutter",
             dependencies: [
+                "DeclutterLib",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Logging", package: "swift-log"),
-                "Files",                
             ]),
+        .testTarget(
+            name: "DeclutterLibTests",
+            dependencies: ["DeclutterLib"]),
         .testTarget(
             name: "DeclutterTests",
             dependencies: ["Declutter"]),
+        
     ]
 )

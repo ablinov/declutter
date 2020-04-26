@@ -2,6 +2,7 @@ import Foundation
 import ArgumentParser
 import Files
 import Logging
+import DeclutterLib
 
 let logger = Logger(label: "main")
 

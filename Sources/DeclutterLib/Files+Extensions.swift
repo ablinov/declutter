@@ -3,7 +3,7 @@ import Files
 import CommonCrypto
 
 extension File {
-    func calculateMD5Hash() throws -> String {
+    public func calculateMD5Hash() throws -> String {
         let bufferSize = 1024 * 1024
 
         guard let file = FileHandle(forReadingAtPath: path) else { throw FileSystem.Item.PathError.invalid(path) }
@@ -32,25 +32,5 @@ extension File {
         let hashString = data.map { String(format: "%02hhx", $0) }.joined()
         
         return hashString
-    }
-}
-
-extension Array {
-    func chunked(by chunkSize: Int) -> [ArraySlice<Element>] {
-        stride(from: 0, to: self.count, by: chunkSize).map {
-            self[$0..<Swift.min($0 + chunkSize, self.count)]
-        }
-    }
-    
-    func divided(into numberOfChunks: Int) -> [ArraySlice<Element>] {
-        let chunkSize = Int(count / numberOfChunks).clamped(to: 1...count)
-        
-        return self.chunked(by: chunkSize)
-    }
-}
-
-extension Comparable {
-    func clamped(to limits: ClosedRange<Self>) -> Self {
-        min(max(self, limits.lowerBound), limits.upperBound)
     }
 }
