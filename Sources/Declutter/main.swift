@@ -25,18 +25,19 @@ struct Declutter: ParsableCommand {
         
         logger.info("Gathered \(allFiles.count) files")
         
-        var filesByHash: [String: [File]] = [:]
+        logger.info("Calculating hashes")
+        
+        var allFilesByHash: [String: [File]] = [:]
         var anyError: Error? = nil
 
         let numberOfSlices = allFiles.count.clamped(to: 1...32)
-        let slices = Array(allFiles).divided(into: numberOfSlices)
-        
-        logger.info("Calculating hashes for \(slices.count) slices")
-        
+        let fileSlices = allFiles.divided(into: numberOfSlices)
+                
         let resultCollationQueue = DispatchQueue(label: "HashCalculation.ResultCollation")
         
-        DispatchQueue.concurrentPerform(iterations: slices.count) { i in
-            let slice = slices[i]
+        logger.info("Split files into \(fileSlices.count) slices")
+        DispatchQueue.concurrentPerform(iterations: fileSlices.count) { i in
+            let slice = fileSlices[i]
             var sliceHashes: [String: [File]] = [:]
             var sliceError: Error? = nil
             
@@ -56,16 +57,16 @@ struct Declutter: ParsableCommand {
                 if let sliceError = sliceError {
                     anyError = sliceError
                 } else {
-                    filesByHash.merge(sliceHashes) { $0 + $1 }
+                    allFilesByHash.merge(sliceHashes) { $0 + $1 }
                 }
             }
         }
         
         guard anyError == nil else { throw anyError! }
 
-        logger.info("Finished calculting hashes. Found \(filesByHash.count) unique files")
+        logger.info("Finished calculting hashes. Found \(allFilesByHash.count) unique files")
         
-        let duplicates = filesByHash.values.filter { $0.count > 1 }
+        let duplicates = allFilesByHash.values.filter { $0.count > 1 }
 
         if duplicates.count > 0 {
             let totalDuplicateFiles = duplicates.reduce(0) { $0 + ($1.count - 1) }
