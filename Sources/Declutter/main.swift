@@ -35,9 +35,16 @@ struct Declutter: ParsableCommand {
             logger.info("Did not find any duplicates in \(path)")
         }
 
-        let duplicatePaths = duplicates.map { $0.map(\.path) }
+        let duplicatePaths = duplicates.map { $0.map(\.file.path) }
 
         try write(duplicateResults: duplicatePaths, to: outputFile)
+        
+        var duplicateFolderCandidates: Set<[Folder]> = []
+        
+        for duplicateFiles in duplicates {
+            let containingFolders = duplicateFiles.compactMap { $0.file.parent }
+            duplicateFolderCandidates.insert(containingFolders)
+        }
     }
 }
 
