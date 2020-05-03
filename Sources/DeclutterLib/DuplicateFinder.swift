@@ -75,9 +75,17 @@ public func findDuplicateFiles(in folder: Folder,
             folderMatches.append((pair.first, pair.second, .exactMatch))
         } else if filesInFirstFolder.isSuperset(of: filesInSecondFolder) {
             folderMatches.append((pair.first, pair.second, .firstIsSupersetOfSecond))
-        } else if filesInSecondFolder.isSuperset(of: filesInFirstFolder) {
-            folderMatches.append((pair.first, pair.second, .secondIsSupersetOfFirst))
+        } else if filesInFirstFolder.isSubset(of: filesInSecondFolder) {
+            folderMatches.append((pair.first, pair.second, .firstIsSubsetOfSecond))
         }
+    }
+    
+    folderMatches.sort {
+        if $0.2 != $1.2 {
+            return $0.2 < $1.2
+        }
+        
+        return $0.0 < $1.0
     }
     
     return DeclutterCalculationResult(duplicateFiles: duplicateFiles.map { $0.map(\.file) }, folderMatches: folderMatches)

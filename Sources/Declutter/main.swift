@@ -44,8 +44,8 @@ struct Declutter: ParsableCommand {
                 logger.info("✅ = \(firstPath) contains exactly the same files as \(secondPath)")
             case .firstIsSupersetOfSecond:
                 logger.info("✅ > \(firstPath) contains all files from \(secondPath) and some more files")
-            case .secondIsSupersetOfFirst:
-                logger.info("✅ > \(secondPath) contains all files from \(firstPath) and some more files")
+            case .firstIsSubsetOfSecond:
+                logger.info("✅ < \(firstPath) is a subset of \(secondPath)")
             }
         }
 
