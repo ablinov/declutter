@@ -1,10 +1,8 @@
 import Foundation
 import ArgumentParser
 import Files
-import Logging
 import DeclutterLib
-
-let logger = Logger(label: "main")
+import Chalk
 
 struct Declutter: ParsableCommand {
     
@@ -30,9 +28,9 @@ struct Declutter: ParsableCommand {
         if result.duplicateFiles.count > 0 {
             let totalDuplicateFiles = result.duplicateFiles.reduce(0) { $0 + ($1.count - 1) }
             
-            logger.info("Found \(totalDuplicateFiles) files that are duplicates and can be deleted")
+            print("Found \(totalDuplicateFiles) files that are duplicates and can be deleted")
         } else {
-            logger.info("Did not find any duplicates in \(path)")
+            print("Did not find any duplicates in \(path)")
         }
         
         for folderMatch in result.folderMatches {
@@ -41,11 +39,11 @@ struct Declutter: ParsableCommand {
             
             switch folderMatch.2 {
             case .exactMatch:
-                logger.info("✅ = \(firstPath) contains exactly the same files as \(secondPath)")
+                print("✅ = \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
             case .firstIsSupersetOfSecond:
-                logger.info("✅ > \(firstPath) contains all files from \(secondPath) and some more files")
+                print("✅ > \(firstPath, style: .bold) contains all files from \(secondPath, style: .bold) and some more files")
             case .firstIsSubsetOfSecond:
-                logger.info("✅ < \(firstPath) is a subset of \(secondPath)")
+                print("✅ < \(firstPath, style: .bold) is a subset of \(secondPath, style: .bold)")
             }
         }
 
