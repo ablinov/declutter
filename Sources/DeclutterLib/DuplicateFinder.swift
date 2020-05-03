@@ -61,6 +61,9 @@ public func findDuplicateFiles(in folder: Folder,
     var folderMatches: [(Folder, Folder, FolderComparisonResult)] = []
     
     for pair in pairsOfDuplicateFolderCandidates {
+        // Only consider "leaf" folders
+        guard pair.first.subfolders.count == 0 && pair.second.subfolders.count == 0 else { continue }
+        
         let filesInFirstFolder = try Set(pair.first.files.map { (file: File) -> FileWithHash in
             guard let fileWithHash = allFilesWithHash.first(where: { file == $0.file }) else { throw FileSystem.Item.FileError.folderContentsChanged }
             return fileWithHash

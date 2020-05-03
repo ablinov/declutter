@@ -3,7 +3,7 @@ import Files
 
 public struct DeclutterCalculationResult {
     public let duplicateFiles: [[File]]
-    public let folderMatches: [(Folder, Folder, FolderComparisonResult)]
+    public let folderMatches: [(first: Folder, second: Folder, comparisonResult: FolderComparisonResult)]
 }
 
 public enum FolderComparisonResult {

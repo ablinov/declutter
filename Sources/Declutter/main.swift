@@ -36,10 +36,10 @@ struct Declutter: ParsableCommand {
         var output: [String] = []
         
         for folderMatch in result.folderMatches {
-            let firstPath = folderMatch.0.path(relativeTo: sourceFolder)
-            let secondPath = folderMatch.1.path(relativeTo: sourceFolder)
+            let firstPath = folderMatch.first.path(relativeTo: sourceFolder)
+            let secondPath = folderMatch.second.path(relativeTo: sourceFolder)
             
-            switch folderMatch.2 {
+            switch folderMatch.comparisonResult {
             case .exactMatch:
                 output.append("= \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
             case .firstIsSupersetOfSecond(let diff):
