@@ -8,6 +8,6 @@ public struct DeclutterCalculationResult {
 
 public enum FolderComparisonResult {
     case exactMatch
-    case firstIsSuperSetOfSecond
-    case secondIsSuperSetOfFirst
+    case firstIsSupersetOfSecond
+    case secondIsSupersetOfFirst
 }

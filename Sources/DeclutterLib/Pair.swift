@@ -1,19 +1,25 @@
 import Foundation
 
-public struct Pair<Element: Hashable & Equatable> {
+public struct OrderedPair<Element: Hashable & Equatable & Comparable> {
     let first: Element
     let second: Element
-}
-
-extension Pair: Equatable {
-    public static func == (lhs: Pair, rhs: Pair) -> Bool {
-        (lhs.first == rhs.first && lhs.second == rhs.second) || (lhs.first == rhs.second && lhs.second == rhs.first)
+    
+    init(_ first: Element, _ second: Element) {
+        if first < second {
+            self.first = first
+            self.second = second
+        } else {
+            self.first = second
+            self.second = first
+        }
     }
 }
 
-extension Pair: Hashable { }
+extension OrderedPair: Equatable { }
 
-extension Pair: CustomDebugStringConvertible {
+extension OrderedPair: Hashable { }
+
+extension OrderedPair: CustomDebugStringConvertible {
     public var debugDescription: String {
         "(\(first), \(second))"
     }

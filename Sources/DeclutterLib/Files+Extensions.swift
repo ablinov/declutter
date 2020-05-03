@@ -28,3 +28,15 @@ extension Folder: Hashable {
         hasher.combine(path)
     }
 }
+
+extension Folder: Comparable {
+    public static func < (lhs: Folder, rhs: Folder) -> Bool {
+        lhs.path < rhs.path
+    }
+}
+
+extension FileSystem.Item {
+    enum FileError: Error {
+        case folderContentsChanged
+    }
+}

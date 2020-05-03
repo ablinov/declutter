@@ -26,11 +26,11 @@ extension Array {
     }
 }
 
-extension Array where Element: Hashable {
-    public var permutationsOfPairs: [Pair<Element>] {
+extension Array where Element: Hashable & Comparable {
+    public var permutationsOfPairs: [OrderedPair<Element>] {
         guard let (element, rest) = chopped() else { return [] }
         
-        let pairingsWithFirst = rest.map { Pair(first: element, second: $0) }
+        let pairingsWithFirst = rest.map { OrderedPair(element, $0) }
         
         return pairingsWithFirst + rest.permutationsOfPairs
     }

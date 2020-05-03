@@ -30,9 +30,23 @@ struct Declutter: ParsableCommand {
         if result.duplicateFiles.count > 0 {
             let totalDuplicateFiles = result.duplicateFiles.reduce(0) { $0 + ($1.count - 1) }
             
-            logger.info("Found \(totalDuplicateFiles) that are duplicates and can be deleted")
+            logger.info("Found \(totalDuplicateFiles) files that are duplicates and can be deleted")
         } else {
             logger.info("Did not find any duplicates in \(path)")
+        }
+        
+        for folderMatch in result.folderMatches {
+            let firstPath = folderMatch.0.path(relativeTo: sourceFolder)
+            let secondPath = folderMatch.1.path(relativeTo: sourceFolder)
+            
+            switch folderMatch.2 {
+            case .exactMatch:
+                logger.info("✅ = \(firstPath) contains exactly the same files as \(secondPath)")
+            case .firstIsSupersetOfSecond:
+                logger.info("✅ > \(firstPath) contains all files from \(secondPath) and some more files")
+            case .secondIsSupersetOfFirst:
+                logger.info("✅ > \(secondPath) contains all files from \(firstPath) and some more files")
+            }
         }
 
         let duplicatePaths = result.duplicateFiles.map { $0.map(\.path) }

@@ -50,18 +50,35 @@ public func findDuplicateFiles(in folder: Folder,
     
     if let error = anyError { throw error }
     
-    let allFilesByHash = Dictionary.init(grouping: allFilesWithHash) { $0.md5Hash }
+    let allFilesByHash = Dictionary(grouping: allFilesWithHash) { $0.md5Hash }
     
     logger.info("Finished calculting hashes. Found \(allFilesByHash.count) unique files")
     
     let duplicateFiles = allFilesByHash.values.filter { $0.count > 1 }
     let duplicateFolderCandidates = duplicateFiles.map { $0.map(\.file.parent!) }
-    let pairsOfDuplicateFolderCandidates = Set(duplicateFolderCandidates.flatMap { $0.permutationsOfPairs })
+    let pairsOfDuplicateFolderCandidates = Set(duplicateFolderCandidates.flatMap { $0.permutationsOfPairs }).filter { $0.first != $0.second }
     
-    logger.info("Duplicate folder candidates:")
-    for dup in pairsOfDuplicateFolderCandidates {
-        logger.info("\(dup)")
+    var folderMatches: [(Folder, Folder, FolderComparisonResult)] = []
+    
+    for pair in pairsOfDuplicateFolderCandidates {
+        let filesInFirstFolder = try Set(pair.first.files.map { (file: File) -> FileWithHash in
+            guard let fileWithHash = allFilesWithHash.first(where: { file == $0.file }) else { throw FileSystem.Item.FileError.folderContentsChanged }
+            return fileWithHash
+        })
+        
+        let filesInSecondFolder = try Set(pair.second.files.map { (file: File) -> FileWithHash in
+            guard let fileWithHash = allFilesWithHash.first(where: { file == $0.file }) else { throw FileSystem.Item.FileError.folderContentsChanged }
+            return fileWithHash
+        })
+        
+        if filesInFirstFolder == filesInSecondFolder {
+            folderMatches.append((pair.first, pair.second, .exactMatch))
+        } else if filesInFirstFolder.isSuperset(of: filesInSecondFolder) {
+            folderMatches.append((pair.first, pair.second, .firstIsSupersetOfSecond))
+        } else if filesInSecondFolder.isSuperset(of: filesInFirstFolder) {
+            folderMatches.append((pair.first, pair.second, .secondIsSupersetOfFirst))
+        }
     }
     
-    return DeclutterCalculationResult(duplicateFiles: duplicateFiles.map { $0.map(\.file) }, folderMatches: [])
+    return DeclutterCalculationResult(duplicateFiles: duplicateFiles.map { $0.map(\.file) }, folderMatches: folderMatches)
 }

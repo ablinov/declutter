@@ -20,6 +20,10 @@ create_test_data: clean_test_data
 	echo "a" > ./test_data/A/a.txt
 	echo "b" > ./test_data/A/b.txt
 	
+	mkdir -p ./test_data/exact_copy_of_A/
+	echo "a" > ./test_data/exact_copy_of_A/w.txt
+	echo "b" > ./test_data/exact_copy_of_A/z.txt
+	
 	mkdir -p ./test_data/subset_of_A/
 	echo "a" > ./test_data/subset_of_A/a.txt
 	

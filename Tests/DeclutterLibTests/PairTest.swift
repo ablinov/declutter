@@ -3,7 +3,11 @@ import XCTest
 
 class TestPair: XCTestCase {
     func testEquality() {
-        XCTAssertEqual(Pair(first: 1, second: 2), Pair(first: 1, second: 2))
-        XCTAssertEqual(Pair(first: 1, second: 2), Pair(first: 2, second: 1))
+        XCTAssertEqual(OrderedPair(1, 2), OrderedPair(1, 2))
+        XCTAssertEqual(OrderedPair(1, 2), OrderedPair(2, 1))
+        
+        let testSet = Set([OrderedPair(1, 2),
+                           OrderedPair(2, 1),])
+        XCTAssertEqual(testSet.count, 1)
     }
 }
