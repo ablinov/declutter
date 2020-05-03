@@ -21,4 +21,15 @@ class TestArrayExtensions: XCTestCase {
         
         XCTAssertEqual(Array(1...51).divided(into: 52).count, 51)
     }
+    
+    func testPermutations() {
+        XCTAssertEqual(Array(1...3).permutationsOfPairs.count, 3)
+        XCTAssertEqual(Array(1...4).permutationsOfPairs.count, 6)
+        XCTAssertEqual(Array(1...5).permutationsOfPairs.count, 10)
+        
+        let testPermutations = Array(1...3).permutationsOfPairs
+        XCTAssertTrue(testPermutations.contains(where: { $0.first == 1 && $0.second == 2}))
+        XCTAssertTrue(testPermutations.contains(where: { $0.first == 1 && $0.second == 3}))
+        XCTAssertTrue(testPermutations.contains(where: { $0.first == 2 && $0.second == 3}))
+    }
 }

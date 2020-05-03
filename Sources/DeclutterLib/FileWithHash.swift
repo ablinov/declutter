@@ -12,6 +12,18 @@ public struct FileWithHash {
     }
 }
 
+extension FileWithHash: Equatable {
+    public static func == (lhs: FileWithHash, rhs: FileWithHash) -> Bool {
+        lhs.md5Hash == rhs.md5Hash
+    }
+}
+
+extension FileWithHash: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(md5Hash)
+    }
+}
+
 private func calculateMD5Hash(forFileAt path: String) throws -> String {
     let bufferSize = 1024 * 1024
 

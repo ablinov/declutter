@@ -26,6 +26,22 @@ extension Array {
     }
 }
 
+extension Array where Element: Hashable {
+    public var permutationsOfPairs: [Pair<Element>] {
+        guard let (element, rest) = chopped() else { return [] }
+        
+        let pairingsWithFirst = rest.map { Pair(first: element, second: $0) }
+        
+        return pairingsWithFirst + rest.permutationsOfPairs
+    }
+    
+    func chopped() -> (Element, [Element])? {
+        guard let x = self.first else { return nil }
+        
+        return (x, Array(self.suffix(from: 1)))
+    }
+}
+
 extension Comparable {
     public func clamped(to limits: ClosedRange<Self>) -> Self {
         min(max(self, limits.lowerBound), limits.upperBound)

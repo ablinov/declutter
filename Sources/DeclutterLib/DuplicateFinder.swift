@@ -4,7 +4,7 @@ import Logging
 
 public func findDuplicateFiles(in folder: Folder,
                                ignoring foldersToIgnore: [Folder] = [],
-                               withLogger logger: Logger = Logger(label: "DuplicateFileFinder")) throws -> [[FileWithHash]] {
+                               withLogger logger: Logger = Logger(label: "DuplicateFileFinder")) throws -> DeclutterCalculationResult {
     logger.info("Gathering files")
     
     let allFiles = recursivelyCollectFiles(in: folder, ignoring: foldersToIgnore)
@@ -54,7 +54,14 @@ public func findDuplicateFiles(in folder: Folder,
     
     logger.info("Finished calculting hashes. Found \(allFilesByHash.count) unique files")
     
-    let duplicates = allFilesByHash.values.filter { $0.count > 1 }
+    let duplicateFiles = allFilesByHash.values.filter { $0.count > 1 }
+    let duplicateFolderCandidates = duplicateFiles.map { $0.map(\.file.parent!) }
+    let pairsOfDuplicateFolderCandidates = Set(duplicateFolderCandidates.flatMap { $0.permutationsOfPairs })
     
-    return duplicates
+    logger.info("Duplicate folder candidates:")
+    for dup in pairsOfDuplicateFolderCandidates {
+        logger.info("\(dup)")
+    }
+    
+    return DeclutterCalculationResult(duplicateFiles: duplicateFiles.map { $0.map(\.file) }, folderMatches: [])
 }

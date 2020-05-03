@@ -25,26 +25,19 @@ struct Declutter: ParsableCommand {
         let outputFile = try Folder.current.createFileIfNeeded(withName: outputFileName)
         let foldersToIgnore = try ignore.map { try Folder(path: $0) }
         
-        let duplicates = try findDuplicateFiles(in: sourceFolder, ignoring: foldersToIgnore)
+        let result = try findDuplicateFiles(in: sourceFolder, ignoring: foldersToIgnore)
         
-        if duplicates.count > 0 {
-            let totalDuplicateFiles = duplicates.reduce(0) { $0 + ($1.count - 1) }
+        if result.duplicateFiles.count > 0 {
+            let totalDuplicateFiles = result.duplicateFiles.reduce(0) { $0 + ($1.count - 1) }
             
             logger.info("Found \(totalDuplicateFiles) that are duplicates and can be deleted")
         } else {
             logger.info("Did not find any duplicates in \(path)")
         }
 
-        let duplicatePaths = duplicates.map { $0.map(\.file.path) }
+        let duplicatePaths = result.duplicateFiles.map { $0.map(\.path) }
 
         try write(duplicateResults: duplicatePaths, to: outputFile)
-        
-        var duplicateFolderCandidates: Set<[Folder]> = []
-        
-        for duplicateFiles in duplicates {
-            let containingFolders = duplicateFiles.compactMap { $0.file.parent }
-            duplicateFolderCandidates.insert(containingFolders)
-        }
     }
 }
 
