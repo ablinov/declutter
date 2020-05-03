@@ -6,12 +6,8 @@ public struct DeclutterCalculationResult {
     public let folderMatches: [(Folder, Folder, FolderComparisonResult)]
 }
 
-public enum FolderComparisonResult: Int, Comparable {
-    public static func < (lhs: FolderComparisonResult, rhs: FolderComparisonResult) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-    
+public enum FolderComparisonResult {
     case exactMatch
-    case firstIsSupersetOfSecond
-    case firstIsSubsetOfSecond
+    case firstIsSupersetOfSecond([File])
+    case firstIsSubsetOfSecond([File])
 }

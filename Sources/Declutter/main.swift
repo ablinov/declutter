@@ -33,19 +33,35 @@ struct Declutter: ParsableCommand {
             print("Did not find any duplicates in \(path)")
         }
         
+        var output: [String] = []
+        
         for folderMatch in result.folderMatches {
             let firstPath = folderMatch.0.path(relativeTo: sourceFolder)
             let secondPath = folderMatch.1.path(relativeTo: sourceFolder)
             
             switch folderMatch.2 {
             case .exactMatch:
-                print("✅ = \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
-            case .firstIsSupersetOfSecond:
-                print("✅ > \(firstPath, style: .bold) contains all files from \(secondPath, style: .bold) and some more files")
-            case .firstIsSubsetOfSecond:
-                print("✅ < \(firstPath, style: .bold) is a subset of \(secondPath, style: .bold)")
+                output.append("= \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
+            case .firstIsSupersetOfSecond(let diff):
+                var outputLine = "📂 > \(firstPath, style: .bold) contains all files from \(secondPath, style: .bold) and following files:\n"
+                
+                for file in diff {
+                    outputLine += "     \(file.name)\n"
+                }
+                
+                output.append(outputLine)
+            case .firstIsSubsetOfSecond(let diff):
+                var outputLine = "📂 < \(firstPath, style: .bold) is a subset of \(secondPath, style: .bold) and is missing following files:\n"
+                
+                for file in diff {
+                    outputLine += "     \(file.name)\n"
+                }
+                
+                output.append(outputLine)
             }
         }
+        
+        output.sorted().forEach { print($0) }
 
         let duplicatePaths = result.duplicateFiles.map { $0.map(\.path) }
 
