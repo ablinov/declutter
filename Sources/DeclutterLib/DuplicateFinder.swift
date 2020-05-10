@@ -85,5 +85,7 @@ public func findDuplicateFiles(in folder: Folder,
         }
     }
     
-    return DeclutterCalculationResult(duplicateFiles: duplicateFiles.map { $0.map(\.file) }, folderMatches: folderMatches)
+    return DeclutterCalculationResult(sourceFolder: folder,
+                                      duplicateFiles: duplicateFiles.map { $0.map(\.file) },
+                                      folderMatches: folderMatches)
 }
