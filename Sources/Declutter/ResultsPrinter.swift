@@ -10,8 +10,8 @@ func print(_ result: DeclutterCalculationResult) {
         print("Found \(setsString) of identical files:")
         
         for duplicates in result.duplicateFiles {
-            for file in duplicates {
-                print("    \(file.path(relativeTo: result.sourceFolder))")
+            for path in duplicates.map({ $0.path(relativeTo: result.sourceFolder) }).sorted() {
+                print("    \(path)")
             }
             print()
         }

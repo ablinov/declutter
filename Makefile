@@ -12,7 +12,7 @@ release:
 install: release
 	cp .build/release/declutter /usr/local/bin/declutter
 	
-test: clean_test_data create_test_data
+test:
 	swift test
 
 create_test_data: clean_test_data
