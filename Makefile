@@ -10,7 +10,6 @@ build:
 
 install: build
 	install ".build/release/declutter" "$(bindir)"
-	cp .build/release/declutter /usr/local/bin/declutter
 	
 uninstall:
 	rm -rf "$(bindir)/declutter"
