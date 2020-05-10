@@ -1,17 +1,23 @@
-.PHONY: test
+prefix ?= /usr/local
+bindir = $(prefix)/bin
+libdir = $(prefix)/lib
 
-build:
-	swift build
-	
 run:
 	@swift run
 
-release:
-	swift build -c release
+build:
+	swift build -c release --disable-sandbox
 
-install: release
+install: build
+	install ".build/release/declutter" "$(bindir)"
 	cp .build/release/declutter /usr/local/bin/declutter
 	
+uninstall:
+	rm -rf "$(bindir)/declutter"
+
+clean:
+	rm -rf .build
+
 test:
 	swift test
 
@@ -35,3 +41,5 @@ create_test_data: clean_test_data
 
 clean_test_data:
 	rm -rf ./test_data/
+
+.PHONY: build install uninstall clean
