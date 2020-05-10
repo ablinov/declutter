@@ -5,13 +5,16 @@ import Logging
 public func findDuplicateFiles(in folder: Folder,
                                ignoring foldersToIgnore: [Folder] = [],
                                withLogger logger: Logger = Logger(label: "DuplicateFileFinder")) throws -> DeclutterCalculationResult {
-    logger.info("Gathering files")
+    logger.info("Looking for duplicate files in \(folder.path)")
+    
+    if !foldersToIgnore.isEmpty {
+        logger.info("Ignoring following folders:")
+        foldersToIgnore.forEach { logger.info("\t\($0.path)") }
+    }
     
     let allFiles = recursivelyCollectFiles(in: folder, ignoring: foldersToIgnore)
     
-    logger.info("Gathered \(allFiles.count) files")
-    
-    logger.info("Calculating hashes")
+    logger.info("Found \(allFiles.count) files. Calculating hashes.")
     
     var allFilesWithHash: [FileWithHash] = []
     var anyError: Error? = nil
@@ -21,7 +24,7 @@ public func findDuplicateFiles(in folder: Folder,
             
     let resultCollationQueue = DispatchQueue(label: "HashCalculation.ResultCollation")
     
-    logger.info("Split files into \(fileSlices.count) slices")
+    logger.trace("Split files into \(fileSlices.count) slices")
     DispatchQueue.concurrentPerform(iterations: fileSlices.count) { i in
         let slice = fileSlices[i]
         var sliceFiles: [FileWithHash] = []
@@ -78,7 +81,7 @@ public func findDuplicateFiles(in folder: Folder,
             folderMatches.append((pair.first, pair.second, .exactMatch))
         } else if filesInFirstFolder.isSuperset(of: filesInSecondFolder) {
             let diff = Array(filesInFirstFolder.subtracting(filesInSecondFolder).map { $0.file })
-            folderMatches.append((pair.first, pair.second, .firstIsSupersetOfSecond(diff)))
+            folderMatches.append((pair.second, pair.first, .firstIsSubsetOfSecond(diff)))
         } else if filesInFirstFolder.isSubset(of: filesInSecondFolder) {
             let diff = Array(filesInSecondFolder.subtracting(filesInFirstFolder).map { $0.file })
             folderMatches.append((pair.first, pair.second, .firstIsSubsetOfSecond(diff)))

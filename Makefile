@@ -2,9 +2,9 @@
 
 build:
 	swift build
-
-run: create_test_data
-	swift run declutter test_data
+	
+run:
+	@swift run
 
 release:
 	swift build -c release
@@ -12,7 +12,7 @@ release:
 install: release
 	cp .build/release/declutter /usr/local/bin/declutter
 	
-test:
+test: clean_test_data create_test_data
 	swift test
 
 create_test_data: clean_test_data

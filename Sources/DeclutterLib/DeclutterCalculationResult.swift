@@ -9,6 +9,5 @@ public struct DeclutterCalculationResult {
 
 public enum FolderComparisonResult {
     case exactMatch
-    case firstIsSupersetOfSecond([File])
     case firstIsSubsetOfSecond([File])
 }

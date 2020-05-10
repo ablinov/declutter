@@ -23,7 +23,10 @@ struct Declutter: ParsableCommand {
             return
         }
         
-        let sourceFolder = try Folder(path: path)
+        var sourceFolder = try Folder(path: path)
+        let standardizedPath = sourceFolder.path.standardizingPath
+        sourceFolder = try Folder(path: standardizedPath)
+        
         let foldersToIgnore = try ignore.map { try Folder(path: $0) }
         
         let result = try findDuplicateFiles(in: sourceFolder, ignoring: foldersToIgnore)

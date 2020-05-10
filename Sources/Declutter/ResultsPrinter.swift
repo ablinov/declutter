@@ -3,41 +3,47 @@ import DeclutterLib
 import Files
 
 func print(_ result: DeclutterCalculationResult) {
+    print("==== 📄 File Results for \(result.sourceFolder.path) ====")
+    
     if result.duplicateFiles.count > 0 {
-        let totalDuplicateFiles = result.duplicateFiles.reduce(0) { $0 + ($1.count - 1) }
+        let setsString = result.duplicateFiles.count == 1 ? "1 set" : "\(result.duplicateFiles.count) sets"
+        print("Found \(setsString) of identical files:")
         
-        print("Found \(totalDuplicateFiles) files that are duplicates and can be deleted")
+        for duplicates in result.duplicateFiles {
+            for file in duplicates {
+                print("    \(file.path(relativeTo: result.sourceFolder))")
+            }
+            print()
+        }
     } else {
-        print("Did not find any duplicates in \(result.sourceFolder)")
+        print("Did not find any duplicate files in \(result.sourceFolder)")
     }
+    
+    print("==== 📂 Folder Results for \(result.sourceFolder.path) ====")
     
     var output: [String] = []
     
-    for folderMatch in result.folderMatches {
-        let firstPath = folderMatch.first.path(relativeTo: result.sourceFolder)
-        let secondPath = folderMatch.second.path(relativeTo: result.sourceFolder)
-        
-        switch folderMatch.comparisonResult {
-        case .exactMatch:
-            output.append("= \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
-        case .firstIsSupersetOfSecond(let diff):
-            var outputLine = "📂 > \(firstPath, style: .bold) contains all files from \(secondPath, style: .bold) and following files:\n"
+    if result.folderMatches.count > 0 {
+        for folderMatch in result.folderMatches {
+            let firstPath = folderMatch.first.path(relativeTo: result.sourceFolder)
+            let secondPath = folderMatch.second.path(relativeTo: result.sourceFolder)
             
-            for file in diff {
-                outputLine += "     \(file.name)\n"
+            switch folderMatch.comparisonResult {
+            case .exactMatch:
+                output.append("= \(firstPath, style: .bold) contains exactly the same files as \(secondPath, style: .bold)")
+            case .firstIsSubsetOfSecond(let diff):
+                var outputLine = "< \(firstPath, style: .bold) is a subset of \(secondPath, style: .bold) and is missing following files:\n"
+                
+                for file in diff {
+                    outputLine += "     \(file.name)\n"
+                }
+                
+                output.append(outputLine)
             }
-            
-            output.append(outputLine)
-        case .firstIsSubsetOfSecond(let diff):
-            var outputLine = "📂 < \(firstPath, style: .bold) is a subset of \(secondPath, style: .bold) and is missing following files:\n"
-            
-            for file in diff {
-                outputLine += "     \(file.name)\n"
-            }
-            
-            output.append(outputLine)
         }
+        
+        output.sorted().forEach { print($0) }
+    } else {
+        print("Did not find any duplicate folders in \(result.sourceFolder.path)")
     }
-    
-    output.sorted().forEach { print($0) }
 }
