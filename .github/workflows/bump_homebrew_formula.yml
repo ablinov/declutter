@@ -2,16 +2,13 @@ name: Bump Homebrew formula
 
 on:
   push:
-    tags: 'v*'
+    tags: '*'
 
 jobs:
   homebrew:
-    name: Bump Homebrew formula
-    runs-on: ubuntu-latest
-    steps:
-      - uses: mislav/bump-homebrew-formula-action@v1.6
-        with:
-          formula-name: declutter
-          homebrew-tap: ablinov/homebrew-made
-        env:
-          COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
+    - name: Update Homebrew formula
+      uses: dawidd6/action-homebrew-bump-formula@v3
+      with:
+        token: ${{secrets.TOKEN}}
+        tap: ablinov/homebrew-made
+        formula: declutter
