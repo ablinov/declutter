@@ -1,4 +1,4 @@
-name: Bumps the Homebrew formula at https://github.com/ablinov/homebrew-made/blob/master/declutter.rb
+name: Bump Homebrew formula
 
 on:
   push:
