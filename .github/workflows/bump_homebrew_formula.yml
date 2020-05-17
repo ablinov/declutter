@@ -9,9 +9,8 @@ jobs:
     name: Bump Homebrew formula
     runs-on: ubuntu-latest
     steps:
-      - uses: mislav/bump-homebrew-formula-action@v1.6
+      - uses: dawidd6/action-homebrew-bump-formula@v3
         with:
-          formula-name: declutter
-          homebrew-tap: ablinov/homebrew-made
-        env:
-          COMMITTER_TOKEN: ${{ secrets.TOKEN }}
+          token: ${{secrets.TOKEN}}
+          tap: ablinov/homebrew-made
+          formula: declutter
