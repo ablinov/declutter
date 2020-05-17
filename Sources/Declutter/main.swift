@@ -6,7 +6,7 @@ import Chalk
 
 struct Declutter: ParsableCommand {
 
-    private let version = "0.1.3"
+    private let version = "0.1.8"
     
     @Argument(default: ".", help: "Folder to declutter")
     var path: String
